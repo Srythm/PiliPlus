@@ -559,11 +559,6 @@ class UgcIntroController extends CommonIntroController with ReloadMixin {
     }
   }
 
-  @override
-  void onClose() {
-    super.onClose();
-  }
-
   void tryToggle() {
     // ponytail: R3 锁定不允许收起 — 当 forceExpandDetail 开启且默认展开时,
     // 阻止用户把展开面板收起(防止误触后无法恢复)。

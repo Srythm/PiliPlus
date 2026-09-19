@@ -61,49 +61,57 @@ class PlaybackCompletedOverlay extends StatelessWidget {
   }
 
   Widget _buildTopLeftButtons() {
-    const btnWidth = 40.0;
+    // 与播放控件顶部按钮 (pages/video/widgets/header_control.dart) 对齐:
+    // 尺寸 42x34、垂直内边距 12,水平安全区由 ViewSafeArea 提供。
+    // 这里不加 Positioned 的 hardcoded 偏移,也不加顶部安全区 —— 控件那边
+    // 由 AppBarAni 只传 left/right,top 不叠加,保持两者纵向一致。
+    const btnWidth = 42.0;
     const btnHeight = 34.0;
     const btnStyle = ButtonStyle(padding: WidgetStatePropertyAll(.zero));
-    return Positioned(
-      top: 8,
-      left: 8,
-      child: ViewSafeArea(
-        top: true,
-        left: true,
-        right: false,
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            SizedBox(
-              width: btnWidth,
-              height: btnHeight,
-              child: IconButton(
-                tooltip: '返回',
-                style: btnStyle,
-                icon: const Icon(
-                  FontAwesomeIcons.arrowLeft,
-                  size: 15,
-                  color: Colors.white,
+    return Positioned.fill(
+      child: Align(
+        alignment: Alignment.topLeft,
+        child: ViewSafeArea(
+          top: false,
+          left: true,
+          right: false,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(
+                  width: btnWidth,
+                  height: btnHeight,
+                  child: IconButton(
+                    tooltip: '返回',
+                    style: btnStyle,
+                    icon: const Icon(
+                      FontAwesomeIcons.arrowLeft,
+                      size: 15,
+                      color: Colors.white,
+                    ),
+                    onPressed: () =>
+                        plPlayerController.onPopInvokedWithResult(false, null),
+                  ),
                 ),
-                onPressed: () =>
-                    plPlayerController.onPopInvokedWithResult(false, null),
-              ),
-            ),
-            SizedBox(
-              width: btnWidth,
-              height: btnHeight,
-              child: IconButton(
-                tooltip: '返回主页',
-                style: btnStyle,
-                icon: const Icon(
-                  FontAwesomeIcons.house,
-                  size: 15,
-                  color: Colors.white,
+                SizedBox(
+                  width: btnWidth,
+                  height: btnHeight,
+                  child: IconButton(
+                    tooltip: '返回主页',
+                    style: btnStyle,
+                    icon: const Icon(
+                      FontAwesomeIcons.house,
+                      size: 15,
+                      color: Colors.white,
+                    ),
+                    onPressed: plPlayerController.onCloseAll,
+                  ),
                 ),
-                onPressed: plPlayerController.onCloseAll,
-              ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

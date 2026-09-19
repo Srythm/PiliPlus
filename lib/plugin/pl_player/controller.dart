@@ -1095,6 +1095,11 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
     }
     _heartDuration = position.inSeconds;
 
+    /// 从"已完成"状态跳出时复位完成态。
+    /// 否则播放结束后再 seek(评论区时间戳/进度条拖拽),
+    /// playerStatus 仍停留在 completed,完成覆盖层会一直盖在画面上。
+    _resetCompletedState();
+
     Future<void> seek() async {
       if (isSeek) {
         /// 拖动进度条调节时，不等待第一帧，防止抖动
@@ -1313,10 +1318,39 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
   // 双击播放、暂停
   Future<void> onDoubleTapCenter() async {
     if (!isLive && isCompleted) {
+      // 注意顺序:先复位完成态,再 seek 回起点,最后 play。
+      // _resetCompletedState 需要读取复位前的真实 playing 值。
+      _resetCompletedState();
       await videoPlayerController!.seek(Duration.zero);
       videoPlayerController!.play();
     } else {
       videoPlayerController!.playOrPause();
+    }
+  }
+
+  /// 复位"已完成"状态。
+  ///
+  /// `playerStatus` 与 `state.completed` 是两套独立判断,必须一起复位:
+  /// - playerStatus 驱动完成覆盖层的显隐(见 pl_player/view/view.dart)
+  /// - state.completed 供 isCompleted getter 使用,且参与 stream.completed
+  ///   的 distinct 去重 —— 不复位会导致跳转后再次播到结尾时
+  ///   true -> true 不发新事件,完成态再也触发不了
+  ///
+  /// 状态取值遵循本文件 play()/pause() 的既有惯例: 由调用方语义决定,
+  /// 而不是去读 state.playing 反推 —— PlayerStatus 只有
+  /// completed/playing/paused 三态,没有"未知",反推在 seek 时常因
+  /// playing 尚未翻转而写入过期值。跳转/重播都隐含"继续看下去"的意图。
+  void _resetCompletedState() {
+    final player = _videoPlayerController;
+    if (player == null) {
+      return;
+    }
+    player.state.completed = false;
+    if (playerStatus.value.isCompleted) {
+      playerStatus.value = PlayerStatus.playing;
+      for (final element in _statusListeners) {
+        element(playerStatus.value);
+      }
     }
   }
 

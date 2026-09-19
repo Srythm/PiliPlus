@@ -28,7 +28,7 @@ class RcmdController extends CommonListController {
         ? await VideoHttp.rcmdVideoListApp(freshIdx: page)
         : await VideoHttp.rcmdVideoList(freshIdx: page);
     if (res case Success(:final response)) {
-      if (response is List && response.length > Pref.refreshCount) {
+      if (response.length > Pref.refreshCount) {
         return Success(response.take(Pref.refreshCount).toList());
       }
     }
