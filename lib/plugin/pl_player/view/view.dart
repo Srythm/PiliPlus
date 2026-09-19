@@ -43,6 +43,8 @@ import 'package:PiliPlus/plugin/pl_player/models/fullscreen_mode.dart';
 import 'package:PiliPlus/plugin/pl_player/models/gesture_type.dart';
 import 'package:PiliPlus/plugin/pl_player/models/play_status.dart';
 import 'package:PiliPlus/plugin/pl_player/models/video_fit_type.dart';
+import 'package:PiliPlus/plugin/pl_player/view/widgets/playback_completed_overlay.dart';
+import 'package:PiliPlus/plugin/pl_player/view/widgets/player_subtitle_view.dart';
 import 'package:PiliPlus/plugin/pl_player/widgets/app_bar_ani.dart';
 import 'package:PiliPlus/plugin/pl_player/widgets/backward_seek.dart';
 import 'package:PiliPlus/plugin/pl_player/widgets/bottom_control.dart';
@@ -1346,6 +1348,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
     maxWidth = widget.maxWidth;
     maxHeight = widget.maxHeight;
     final isFullScreen = this.isFullScreen;
+    final isPortrait = maxHeight >= maxWidth;
     final primary = isFullScreen && colorScheme.isLight
         ? colorScheme.inversePrimary
         : colorScheme.primary;
@@ -1371,9 +1374,10 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
             child: IgnorePointer(
               ignoring: !plPlayerController.enableDragSubtitle,
               child: Obx(
-                () => SubtitleView(
+                () => PlayerSubtitleView(
                   controller: videoController,
                   configuration: plPlayerController.subtitleConfig.value,
+                  backgroundColor: plPlayerController.subtitleBackgroundColor,
                   enableDragSubtitle: plPlayerController.enableDragSubtitle,
                   onUpdatePadding: plPlayerController.onUpdatePadding,
                 ),
@@ -1993,6 +1997,17 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                   )
                 : const SizedBox.shrink();
           }),
+        if (!plPlayerController.isLive)
+          Obx(
+            () => plPlayerController.playerStatus.isCompleted
+                ? Positioned.fill(
+                    child: PlaybackCompletedOverlay(
+                      plPlayerController: plPlayerController,
+                      isPortrait: isPortrait,
+                    ),
+                  )
+                : const SizedBox.shrink(),
+          ),
       ],
     );
     if (PlatformUtils.isDesktop) {

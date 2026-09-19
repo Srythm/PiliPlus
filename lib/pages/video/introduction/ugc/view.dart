@@ -108,7 +108,7 @@ class _UgcIntroPanelState extends State<UgcIntroPanel> {
               onTap: () {
                 if (isLoading) return;
                 feedBack();
-                introController.expand.toggle();
+                introController.tryToggle();
               },
               child: TranslucentColumn(
                 crossAxisAlignment: .start,

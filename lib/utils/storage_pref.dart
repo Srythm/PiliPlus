@@ -390,6 +390,9 @@ abstract final class Pref {
   static bool get expandIntroPanelH =>
       _setting.get(SettingBoxKey.expandIntroPanelH, defaultValue: false);
 
+  static bool get forceExpandDetail =>
+      _setting.get(SettingBoxKey.forceExpandDetail, defaultValue: false);
+
   static bool get horizontalSeasonPanel => _setting.get(
     SettingBoxKey.horizontalSeasonPanel,
     defaultValue: horizontalScreen,
@@ -559,6 +562,9 @@ abstract final class Pref {
 
   static int get retryDelay =>
       _setting.get(SettingBoxKey.retryDelay, defaultValue: 500);
+
+  static int get refreshCount =>
+      _setting.get(SettingBoxKey.refreshCount, defaultValue: 17);
 
   static int get liveQuality => _setting.get(
     SettingBoxKey.liveQuality,

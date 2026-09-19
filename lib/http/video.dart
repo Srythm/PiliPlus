@@ -51,7 +51,7 @@ abstract final class VideoHttp {
 
   // 首页推荐视频
   static Future<LoadingState<List<RcmdVideoItemModel>>> rcmdVideoList({
-    required int ps,
+    int? ps,
     required int freshIdx,
   }) async {
     final res = await Request().get(
@@ -60,7 +60,7 @@ abstract final class VideoHttp {
         'version': 1,
         'feed_version': 'V8',
         'homepage_ver': 1,
-        'ps': ps,
+        if (ps != null) 'ps': ps,
         'fresh_idx': freshIdx,
         'brush': freshIdx,
         'fresh_type': 4,

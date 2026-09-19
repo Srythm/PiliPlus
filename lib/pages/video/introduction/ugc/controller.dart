@@ -559,6 +559,23 @@ class UgcIntroController extends CommonIntroController with ReloadMixin {
     }
   }
 
+  @override
+  void onClose() {
+    super.onClose();
+  }
+
+  void tryToggle() {
+    // ponytail: R3 锁定不允许收起 — 当 forceExpandDetail 开启且默认展开时,
+    // 阻止用户把展开面板收起(防止误触后无法恢复)。
+    // 跟随上游 refa expandable: 用 RxBool expand 代替 ExpandableController。
+    if (Pref.forceExpandDetail &&
+        Pref.alwaysExpandIntroPanel &&
+        expand.value) {
+      return;
+    }
+    expand.toggle();
+  }
+
   /// 播放上一个
   @override
   bool prevPlay([bool skipPart = false]) {

@@ -149,6 +149,16 @@ class ReplyItemGrpc extends StatelessWidget {
 
   Widget _buildHeader(BuildContext context, ColorScheme colorScheme) {
     final member = replyItem.member;
+    final formattedTime = replyLevel == 0
+        ? DateFormatUtils.format(
+            replyItem.ctime.toInt(),
+            format: DateFormatUtils.longFormatDs,
+          )
+        : DateFormatUtils.dateFormat(replyItem.ctime.toInt());
+    final hasLocation = replyItem.replyControl.hasLocation();
+    final replyTime = formattedTime.isEmpty && hasLocation
+        ? '未知时间'
+        : formattedTime;
     Widget header = GestureDetector(
       onTap: () {
         feedBack();
@@ -221,18 +231,13 @@ class ReplyItemGrpc extends StatelessWidget {
                   mainAxisSize: .min,
                   children: [
                     Text(
-                      replyLevel == 0
-                          ? DateFormatUtils.format(
-                              replyItem.ctime.toInt(),
-                              format: DateFormatUtils.longFormatDs,
-                            )
-                          : DateFormatUtils.dateFormat(replyItem.ctime.toInt()),
+                      replyTime,
                       style: TextStyle(
                         fontSize: 11,
                         color: colorScheme.outline,
                       ),
                     ),
-                    if (replyItem.replyControl.hasLocation())
+                    if (hasLocation)
                       Text(
                         ' • ${replyItem.replyControl.location}',
                         style: TextStyle(

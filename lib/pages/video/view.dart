@@ -377,17 +377,30 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
 
     introController.cancelTimer();
 
+    final playerStatus = plPlayerController?.playerStatus.value;
     videoDetailController
       ..videoState.value = false
       ..cancelBlockListener()
-      ..playerStatus = plPlayerController?.playerStatus.value
+      ..playerStatus = playerStatus
       ..brightness = plPlayerController?.brightness.value;
     if (plPlayerController != null) {
       videoDetailController.makeHeartBeat();
       plPlayerController!
         ..removeStatusLister(playerListener)
-        ..removePositionListener(positionListener)
-        ..pause();
+        ..removePositionListener(positionListener);
+      if (playerStatus?.isCompleted != true) {
+        plPlayerController!.pause();
+      }
+    }
+  }
+
+  void _restoreCompletedStatus() {
+    if (mounted &&
+        isShowing &&
+        videoDetailController.playerStatus?.isCompleted == true &&
+        !videoDetailController.plPlayerController.isCloseAll) {
+      videoDetailController.plPlayerController.playerStatus.value =
+          PlayerStatus.completed;
     }
   }
 
@@ -435,14 +448,23 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
     plPlayerController
       ?..addStatusLister(playerListener)
       ..addPositionListener(positionListener);
+    Future<void>? playerInitFuture;
     if (videoDetailController.autoPlay) {
-      videoDetailController.playerInit(
+      playerInitFuture = videoDetailController.playerInit(
         autoplay: videoDetailController.playerStatus?.isPlaying ?? false,
       );
     } else if (videoDetailController.plPlayerController.preInitPlayer &&
         !videoDetailController.isQuerying &&
         videoDetailController.videoUrl != null) {
-      videoDetailController.playerInit();
+      playerInitFuture = videoDetailController.playerInit();
+    }
+
+    if (videoDetailController.playerStatus?.isCompleted == true) {
+      if (playerInitFuture case final playerInitFuture?) {
+        playerInitFuture.then((_) => _restoreCompletedStatus());
+      } else {
+        _restoreCompletedStatus();
+      }
     }
   }
 
@@ -931,6 +953,12 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
               ),
           ],
         ),
+        if (!isFullScreen)
+          Container(
+            width: 1,
+            height: maxHeight - padding.top,
+            color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+          ),
         Offstage(
           offstage: isFullScreen,
           child: SizedBox(

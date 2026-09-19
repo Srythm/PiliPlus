@@ -190,7 +190,9 @@ class _LivePageState extends State<LivePage>
         gridDelegate: gridDelegate,
         delegate: const SliverSingleChildDelegate(
           child: VideoCardVSkeleton(),
-          count: 10,
+          // ponytail: 跟随 liveFeedIndex page_size = 20 (lib/http/live.dart:295),
+          // 让占位卡片数与实际加载条目数同步,避免用户感知的"内容突变"
+          count: 20,
         ),
       ),
       Success(:final response) => SliverMainAxisGroup(

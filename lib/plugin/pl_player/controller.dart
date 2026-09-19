@@ -389,10 +389,11 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
     wordSpacing: 0.1,
     color: Colors.white,
     fontWeight: FontWeight.values[subtitleFontWeight],
-    backgroundColor: subtitleBgOpacity == 0
-        ? null
-        : Colors.black.withValues(alpha: subtitleBgOpacity),
   );
+
+  Color? get subtitleBackgroundColor => subtitleBgOpacity == 0
+      ? null
+      : Colors.black.withValues(alpha: subtitleBgOpacity);
 
   late final Rx<SubtitleViewConfiguration> subtitleConfig = getSubConfig.obs;
 
@@ -964,6 +965,22 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
           videoPlayerServiceHandler?.onPositionChange(position);
 
           makeHeartBeat(posInSeconds);
+        }
+
+        // ponytail: 仅作为兜底(stream.completed 在 video 实际结束时立刻
+        // 触发,会先于此处的 position 阈值)。阈值 0ms 等于禁用,只有
+        // stream.completed 不可靠的场景(position 卡住不前进但
+        // stream.completed 一直不发)会落到这里,且此时 position ≈ duration
+        // 已无限接近 0,不再产生"早 500ms"误触。
+        if (!isLive &&
+            durationInMilliseconds > 0 &&
+            durationInMilliseconds <= position.inMilliseconds &&
+            playerStatus.value != .completed) {
+          playerStatus.value = .completed;
+          for (final element in _statusListeners) {
+            element(.completed);
+          }
+          makeHeartBeat(-1, type: .completed);
         }
 
         for (final element in _positionListeners) {

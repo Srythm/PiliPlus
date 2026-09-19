@@ -2,7 +2,9 @@ import 'package:PiliPlus/http/video.dart';
 import 'package:PiliPlus/pages/rcmd/controller.dart';
 import 'package:PiliPlus/pages/setting/models/model.dart';
 import 'package:PiliPlus/utils/recommend_filter.dart';
+import 'package:PiliPlus/utils/storage.dart';
 import 'package:PiliPlus/utils/storage_key.dart';
+import 'package:PiliPlus/utils/storage_pref.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:material_ui/material_ui.dart';
@@ -17,8 +19,8 @@ List<SettingsModel> get recommendSettings => [
     needReboot: true,
   ),
   SwitchModel(
-    title: '保留首页推荐刷新',
-    subtitle: '下拉刷新时保留上次内容',
+    title: '保存首页推荐刷新',
+    subtitle: '下拉刷新时获取新的内容',
     leading: const Icon(Icons.refresh),
     setKey: SettingBoxKey.enableSaveLastData,
     defaultVal: true,
@@ -31,6 +33,13 @@ List<SettingsModel> get recommendSettings => [
         if (kDebugMode) debugPrint('$e');
       }
     },
+  ),
+  NormalModel(
+    title: '首页刷新数',
+    subtitle: '每次下拉刷新获取的推荐视频条数',
+    leading: const Icon(Icons.numbers),
+    getSubtitle: () => '当前: ${Pref.refreshCount} 条',
+    onTap: _showRefreshCountDialog,
   ),
   SwitchModel(
     title: '显示上次看到位置提示',
@@ -93,11 +102,59 @@ List<SettingsModel> get recommendSettings => [
     onChanged: (value) => RecommendFilter.exemptFilterForFollowed = value,
   ),
   SwitchModel(
-    title: '过滤器也应用于详情页相关视频',
-    subtitle: '其它（如热门视频、搜索等）均不受过滤器影响，无法豁免相关视频中的已关注UP',
+    title: '搜索结果页也应用首页过滤的规则',
+    subtitle: '会影响搜索结果推荐程度,也可能造成搜索结果中的已关注UP被过滤',
     leading: const Icon(Icons.explore_outlined),
     setKey: SettingBoxKey.applyFilterToRelatedVideos,
     defaultVal: true,
     onChanged: (value) => RecommendFilter.applyFilterToRelatedVideos = value,
   ),
 ];
+
+const int refreshCountMax = 17;
+const int refreshCountMin = 1;
+
+Future<void> _showRefreshCountDialog(
+  BuildContext context,
+  VoidCallback setState,
+) async {
+  final controller = TextEditingController(text: '${Pref.refreshCount}');
+  int? clamped;
+  final res = await showDialog<int>(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: const Text('首页刷新数'),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          keyboardType: TextInputType.number,
+          decoration: const InputDecoration(
+            hintText: '请输入 1-17',
+            border: OutlineInputBorder(),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(result: null),
+            child: const Text('取消'),
+          ),
+          TextButton(
+            onPressed: () => Get.back(
+              result: (int.tryParse(controller.text) ?? refreshCountMin).clamp(
+                refreshCountMin,
+                refreshCountMax,
+              ),
+            ),
+            child: const Text('确定'),
+          ),
+        ],
+      );
+    },
+  );
+  clamped = res;
+  if (clamped != null) {
+    await GStorage.setting.put(SettingBoxKey.refreshCount, clamped);
+    setState();
+  }
+}

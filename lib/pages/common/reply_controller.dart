@@ -35,6 +35,18 @@ abstract class ReplyController<R> extends CommonListController<R, ReplyInfo> {
   @override
   bool? get hasFooter => true;
 
+  @override
+  void handleListResponse(List<ReplyInfo> dataList) {
+    final ids = <Int64>{};
+    dataList.removeWhere((item) => !ids.add(item.id));
+  }
+
+  @override
+  void appendDataList(List<ReplyInfo> current, List<ReplyInfo> next) {
+    final ids = current.map((item) => item.id).toSet();
+    current.addAll(next.where((item) => ids.add(item.id)));
+  }
+
   // comment antifraud
   late final _enableCommAntifraud = Pref.enableCommAntifraud;
   late final _biliSendCommAntifraud = Pref.biliSendCommAntifraud;

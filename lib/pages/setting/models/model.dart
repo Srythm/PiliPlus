@@ -64,6 +64,7 @@ class SplitModel extends SettingsModel {
     contentPadding: contentPadding,
     titleStyle: titleStyle,
     isSplit: true,
+    visible: switchModel.visible,
   );
 }
 
@@ -164,6 +165,7 @@ class SwitchModel extends SettingsModel {
   final ValueChanged<bool>? onChanged;
   final bool needReboot;
   final void Function(BuildContext context)? onTap;
+  final bool Function(BuildContext)? visible;
 
   const SwitchModel({
     super.subtitle,
@@ -176,6 +178,7 @@ class SwitchModel extends SettingsModel {
     this.onChanged,
     this.needReboot = false,
     this.onTap,
+    this.visible,
   });
 
   const SwitchModel.split({
@@ -184,6 +187,7 @@ class SwitchModel extends SettingsModel {
     this.needReboot = false,
     this.onChanged,
     this.onTap,
+    this.visible,
   }) : title = null;
 
   @override
@@ -203,6 +207,7 @@ class SwitchModel extends SettingsModel {
     onTap: onTap,
     contentPadding: contentPadding,
     titleStyle: titleStyle,
+    visible: visible,
   );
 }
 

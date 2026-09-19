@@ -17,6 +17,7 @@ class SetSwitchItem extends StatefulWidget {
   final EdgeInsetsGeometry? contentPadding;
   final TextStyle? titleStyle;
   final bool isSplit;
+  final bool Function(BuildContext)? visible;
 
   const SetSwitchItem({
     super.key,
@@ -31,6 +32,7 @@ class SetSwitchItem extends StatefulWidget {
     this.contentPadding,
     this.titleStyle,
     this.isSplit = false,
+    this.visible,
   });
 
   @override
@@ -79,6 +81,9 @@ class _SetSwitchItemState extends State<SetSwitchItem> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.visible != null && !widget.visible!(context)) {
+      return const SizedBox.shrink();
+    }
     final theme = Theme.of(context);
     final titleStyle =
         widget.titleStyle ??

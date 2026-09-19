@@ -95,7 +95,7 @@ class HorizontalMemberPageController
         type: .video,
         mid: mid,
         aid: page == 1
-            ? currAid
+            ? null
             : isLoadPrevious
             ? firstAid
             : lastAid,
@@ -105,7 +105,7 @@ class HorizontalMemberPageController
         next: null,
         seasonId: null,
         seriesId: null,
-        includeCursor: page == 1 ? true : null,
+        includeCursor: null,
       );
 
   @override

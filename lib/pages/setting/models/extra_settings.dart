@@ -147,6 +147,14 @@ List<SettingsModel> get extraSettings => [
     defaultVal: false,
   ),
   const SwitchModel(
+    title: '锁定不允许收起',
+    subtitle: '开启后默认展开状态下无法收起简介',
+    leading: Icon(Icons.lock_outline),
+    setKey: SettingBoxKey.forceExpandDetail,
+    defaultVal: false,
+    visible: _showForceExpandDetail,
+  ),
+  const SwitchModel(
     title: '横屏自动展开视频简介',
     leading: Icon(Icons.expand_more),
     setKey: SettingBoxKey.expandIntroPanelH,
@@ -643,6 +651,8 @@ List<SettingsModel> get extraSettings => [
     },
   ),
 ];
+
+bool _showForceExpandDetail(BuildContext _) => Pref.alwaysExpandIntroPanel;
 
 Future<void> audioNormalization(
   BuildContext context,

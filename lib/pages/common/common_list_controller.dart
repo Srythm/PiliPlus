@@ -13,6 +13,10 @@ abstract class CommonListController<R, T> extends CommonController<R, T> {
 
   void handleListResponse(List<T> dataList) {}
 
+  void appendDataList(List<T> current, List<T> next) {
+    current.addAll(next);
+  }
+
   List<T>? getDataList(R response) {
     return response as List<T>?;
   }
@@ -42,7 +46,7 @@ abstract class CommonListController<R, T> extends CommonController<R, T> {
           checkIsEnd(dataList.length);
           loadingState.value = Success(dataList);
         } else if (loadingState.value case Success(:final response)) {
-          response!.addAll(dataList);
+          appendDataList(response!, dataList);
           checkIsEnd(response.length);
           loadingState.refresh();
         }

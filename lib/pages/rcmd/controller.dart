@@ -21,10 +21,18 @@ class RcmdController extends CommonListController {
   }
 
   @override
-  Future<LoadingState> customGetData() {
-    return appRcmd
-        ? VideoHttp.rcmdVideoListApp(freshIdx: page)
-        : VideoHttp.rcmdVideoList(freshIdx: page, ps: 20);
+  Future<LoadingState> customGetData() async {
+    // ponytail: B 站后端 cap 死返回 ≈17,前端按用户设定截取展示上限
+    // (取 response 前 N,不动累积逻辑,适用首次/下拉/上拉/开关任意组合)
+    final res = appRcmd
+        ? await VideoHttp.rcmdVideoListApp(freshIdx: page)
+        : await VideoHttp.rcmdVideoList(freshIdx: page);
+    if (res case Success(:final response)) {
+      if (response is List && response.length > Pref.refreshCount) {
+        return Success(response.take(Pref.refreshCount).toList());
+      }
+    }
+    return res;
   }
 
   @override
