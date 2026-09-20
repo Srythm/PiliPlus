@@ -1,0 +1,31 @@
+# build.local.ps1.example — 本机构建环境配置模板
+#
+# 使用方式:
+#   1. 复制本文件为 build.local.ps1 (同目录,仓库根)
+#        Copy-Item build.local.ps1.example build.local.ps1
+#   2. 按本机实际路径填写下面的变量
+#   3. 正常执行 .\build-apk.ps1
+#
+# build.local.ps1 已在 .gitignore 中,不会被提交。
+# 本模板示例值均为占位符,不含任何真实机器信息,可安全提交。
+
+# JDK 安装目录 (Build 需要 JDK 17+)
+$env:JAVA_HOME = "C:\Program Files\Java\jdk-XX"
+
+# Android SDK 根目录 (内含 platform-tools / build-tools)
+$env:ANDROID_HOME = "$env:LOCALAPPDATA\Android\Sdk"
+
+# HTTP/HTTPS 代理。直连可用时留空或删掉这两行。
+# 大陆用户通常需要一个本地代理,例如 Clash 默认的 7890 端口。
+$env:PILI_HTTP_PROXY = "http://127.0.0.1:7890"
+
+# 以下均为可选项,不设则走默认逻辑 (fvm 按 .fvmrc 查找,再回落 PATH)
+
+# flutter 可执行文件绝对路径 (不填则自动查找)
+# $env:PILI_FLUTTER_BIN = "C:\path\to\flutter\bin\flutter.bat"
+
+# fvm 根目录 (默认 $env:USERPROFILE\fvm)
+# $env:PILI_FVM_ROOT = "$env:USERPROFILE\fvm"
+
+# 可选: 设置 Flutter 国内镜像
+# $env:FLUTTER_STORAGE_BASE_URL = "https://storage.flutter-io.cn"

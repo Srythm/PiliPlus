@@ -145,6 +145,13 @@ devtools_options.yaml
 # FVM Version Cache
 .fvm/
 
+# 本地构建环境配置 (含本机路径, 不得提交)
+build.local.ps1
+
+# 本地交接文档 / Agent 工作记录 (仅本机保留)
+AGENTS.md
+.workbuddy/
+
 pili_release.json
 
 dist
