@@ -17,7 +17,9 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
 # update when release
-version: 2.1.4+1
+# fork 版本线（勿被上游覆盖）：versionName 跟上游，build 号(+N) 必须大于 fork 上一版，
+# 否则 Android 会以 INSTALL_FAILED_VERSION_DOWNGRADE 拒绝覆盖安装。历史：2.1.2+4 → 2.1.4+5
+version: 2.1.4+5
 
 environment:
   sdk: ">=3.13.0"
