@@ -148,6 +148,10 @@ if (-not $flutterBin) {
 Write-Host "flutter:      $flutterBin"
 
 # ============ build ============
+# 记录构建前的产物指纹，用于事后识别「陈旧 APK 被误报为成功」(2026-09-21)
+$apkPath = "$repoRoot\build\app\outputs\flutter-apk\app-release.apk"
+$apkStampBefore = if (Test-Path $apkPath) { (Get-Item $apkPath).LastWriteTimeUtc } else { $null }
+
 $sw = [System.Diagnostics.Stopwatch]::StartNew()
 $args = @(
     "build", "apk", "--release"
@@ -157,11 +161,33 @@ $args = @(
     "--dart-define=pili.hash=$COMMIT_HASH"
 )
 & $flutterBin @args
+$buildExit = $LASTEXITCODE
 $sw.Stop()
 Write-Host ("build done in {0:N0}s" -f $sw.Elapsed.TotalSeconds)
 
+# ---- 闸门 1：构建失败则立即中止，不去「验证」任何东西 ----
+if ($buildExit -ne 0) {
+    Write-Host ""
+    Write-Host "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    Write-Host "构建失败（flutter 退出码 $buildExit）。"
+    Write-Host "已跳过产物验证 —— 不要误把上一次留下的旧 APK 当成本次结果。"
+    Write-Host "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    exit $buildExit
+}
+
 # ============ 验证 ============
-$apk = "$repoRoot\build\app\outputs\flutter-apk\app-release.apk"
+$apk = $apkPath
+if (-not (Test-Path $apk)) {
+    Write-Host "!!! 构建报成功但找不到产物: $apk"
+    exit 3
+}
+# ---- 闸门 2：产物必须是本次新生成的，否则拒绝通过 ----
+if ($null -ne $apkStampBefore -and (Get-Item $apk).LastWriteTimeUtc -le $apkStampBefore) {
+    Write-Host "!!! 产物时间戳早于本次构建开始 —— 这是陈旧 APK，不能作为本次结果"
+    Write-Host "    产物: $apk"
+    Write-Host "    时间: $((Get-Item $apk).LastWriteTimeUtc) (构建前为 $apkStampBefore)"
+    exit 3
+}
 if (Test-Path $apk) {
     $buildTools = Get-ChildItem -Path "$androidHome\build-tools" -Directory -ErrorAction SilentlyContinue |
         Sort-Object Name -Descending | Select-Object -First 1
