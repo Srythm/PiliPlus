@@ -182,26 +182,21 @@ class _UgcIntroPanelState extends State<UgcIntroPanel> {
                   ],
                   // 合集
                   if (!isLoading &&
-                      videoDetail.ugcSeason != null &&
                       (isPortrait ||
                           !videoDetailCtr
                               .plPlayerController
-                              .horizontalSeasonPanel))
-                    Obx(
-                      () => SeasonPanel(
-                        key: ValueKey(introController.videoDetail.value),
-                        heroTag: widget.heroTag,
-                        showEpisodes: widget.showEpisodes,
-                        ugcIntroController: introController,
+                              .horizontalSeasonPanel)) ...[
+                    if (videoDetail.hasSeason)
+                      Obx(
+                        () => SeasonPanel(
+                          key: ValueKey(introController.videoDetail.value),
+                          heroTag: widget.heroTag,
+                          showEpisodes: widget.showEpisodes,
+                          ugcIntroController: introController,
+                        ),
                       ),
-                    ),
-                  if (!isLoading &&
-                      videoDetail.pages != null &&
-                      videoDetail.pages!.length > 1 &&
-                      (isPortrait ||
-                          !videoDetailCtr
-                              .plPlayerController
-                              .horizontalSeasonPanel))
+                  ],
+                  if (videoDetail.hasParts)
                     Obx(
                       () => PagesPanel(
                         key: ValueKey(introController.videoDetail.value),
@@ -717,7 +712,7 @@ class _UgcIntroPanelState extends State<UgcIntroPanel> {
               child: Row(
                 spacing: 25,
                 children: staff
-                    .map((e) => _buildStaff(isPortrait, mid, e))
+                    .map((e) => _buildStaff(isPortrait, e))
                     .toList(),
               ),
             ),
@@ -761,7 +756,6 @@ class _UgcIntroPanelState extends State<UgcIntroPanel> {
 
   Widget _buildStaff(
     bool isPortrait,
-    int? ownerMid,
     Staff item,
   ) {
     void onTap() => Get.toNamed(
@@ -770,10 +764,12 @@ class _UgcIntroPanelState extends State<UgcIntroPanel> {
     return GestureDetector(
       behavior: .opaque,
       onTap: () {
-        if (item.mid == ownerMid &&
-            !isPortrait &&
-            introController.horizontalMemberPage) {
-          widget.onShowMemberPage(ownerMid);
+        // ponytail: 原来只有 UP 主本人走侧栏、其余联合投稿作者走整页 `/member`。
+        // 侧栏已经打开时整页会被它盖住 —— 表现就是"点非 UP 主的头像没反应"。
+        // 现在统一：横屏且开启"侧栏打开UP主页"时，点联合投稿里的任意作者，
+        // 都在同一个侧栏里打开**他自己**的主页。
+        if (!isPortrait && introController.horizontalMemberPage) {
+          widget.onShowMemberPage(item.mid);
         } else {
           onTap();
         }

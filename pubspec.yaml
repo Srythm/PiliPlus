@@ -18,12 +18,13 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 # of the product and file versions while build-number is used as the build suffix.
 # update when release
 # fork 版本线（勿被上游覆盖）：versionName 跟上游，build 号(+N) 必须大于 fork 上一版，
-# 否则 Android 会以 INSTALL_FAILED_VERSION_DOWNGRADE 拒绝覆盖安装。历史：2.1.2+4 → 2.1.4+5 → 2.1.4+6
-version: 2.1.4+6
+# 否则 Android 会以 INSTALL_FAILED_VERSION_DOWNGRADE 拒绝覆盖安装。
+# 历史：2.1.2+4 → 2.1.4+5 → 2.1.4+6 → 2.1.6+7
+version: 2.1.6+7
 
 environment:
   sdk: ">=3.13.0"
-  flutter: 3.47.4
+  flutter: 3.47.6
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -43,13 +44,16 @@ dependencies:
     git:
       url: https://github.com/bggRGjQaUbCoE/audio_service.git
       path: audio_service
-      ref: main
-  audio_session: ^0.2.2
+      ref: dev
+  audio_session:
+    git:
+      url: https://github.com/bggRGjQaUbCoE/audio_session.git
+      ref: dev
   battery_plus: ^7.0.0
   brotli: ^0.6.0
   cached_network_image_ce:
     git:
-      url: https://github.com/My-Responsitories/flutter_cached_network_image_ce.git
+      url: https://github.com/bggRGjQaUbCoE/flutter_cached_network_image_ce.git
       path: cached_network_image
       ref: develop
   canvas_danmaku:
@@ -101,6 +105,7 @@ dependencies:
     git:
       url: https://github.com/bggRGjQaUbCoE/flutter_sortable_wrap.git
       ref: master
+  flutter_staggered_grid_view: ^0.7.0
   flutter_svg: ^2.0.14
   flutter_volume_controller: ^2.0.0
   font_awesome_flutter:
@@ -136,6 +141,7 @@ dependencies:
     git:
       url: https://github.com/bggRGjQaUbCoE/flutter_native_device_orientation.git
       ref: master
+  package_info_plus: ^10.1.0
   path: ^1.9.1
   path_provider: ^2.1.5
   permission_handler_android: ^14.0.0
@@ -145,8 +151,6 @@ dependencies:
   protobuf: ^6.0.0
   re_highlight: ^0.0.3
   saver_gallery: ^5.0.2
-  screen_brightness_android: ^2.1.6
-  screen_brightness_ios: ^2.1.4
   screen_brightness_platform_interface: ^2.1.0
   screen_retriever: ^0.2.0
   share_plus: ^13.1.0
@@ -161,7 +165,6 @@ dependencies:
   uuid: ^4.5.1
   vector_math: ^2.2.0
   wakelock_plus: ^1.2.8
-  waterfall_flow: ^3.1.0
   web_socket_channel: ^3.0.3
   webdav_client:
     git:
@@ -189,42 +192,37 @@ dependency_overrides:
     git:
       url: https://github.com/My-Responsitories/media-kit.git
       path: media_kit
-      ref: upstream
+      ref: native
   media_kit_libs_android_video:
     git:
       url: https://github.com/My-Responsitories/media-kit.git
       path: libs/android/media_kit_libs_android_video
-      ref: upstream
+      ref: native
   media_kit_libs_ios_video:
     git:
       url: https://github.com/My-Responsitories/media-kit.git
       path: libs/ios/media_kit_libs_ios_video
-      ref: upstream
+      ref: native
   media_kit_libs_video:
     git:
       url: https://github.com/My-Responsitories/media-kit.git
       path: libs/universal/media_kit_libs_video
-      ref: upstream
+      ref: native
   media_kit_libs_windows_video:
     git:
       url: https://github.com/My-Responsitories/media-kit.git
       path: libs/windows/media_kit_libs_windows_video
-      ref: upstream
+      ref: native
   media_kit_native_event_loop:
     git:
       url: https://github.com/My-Responsitories/media-kit.git
       path: media_kit_native_event_loop
-      ref: upstream
+      ref: native
   media_kit_video:
     git:
-      url: https://github.com/My-Responsitories/media-kit.git
+      url: https://github.com/bggRGjQaUbCoE/media-kit.git
       path: media_kit_video
-      ref: upstream
-  cached_network_image_ce:
-    git:
-      url: https://github.com/My-Responsitories/flutter_cached_network_image_ce.git
-      path: cached_network_image
-      ref: develop
+      ref: native
 
 dev_dependencies:
   flutter_test:

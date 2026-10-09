@@ -60,12 +60,18 @@ class _HorizontalMemberPageState extends State<HorizontalMemberPage> {
   @override
   void initState() {
     super.initState();
+    final tag = widget.videoDetailController.heroTag;
+    // ponytail: 联合投稿时这个侧栏会被连续打开给不同作者(先点 A 再点 B)。
+    // GetX 的 `Get.put` 在同 tag 已存在时会**丢弃新传入的实例、返回旧的那个**，
+    // 所以面板会永远停在第一个打开的人身上 —— 表现为"点谁都是同一个人"。
+    // 先清掉旧实例再注册，切人时控制器才会跟着换。
+    Get.delete<HorizontalMemberPageController>(tag: tag, force: true);
     _controller = Get.put(
       HorizontalMemberPageController(
         mid: widget.mid,
         currAid: widget.videoDetailController.aid.toString(),
       ),
-      tag: widget.videoDetailController.heroTag,
+      tag: tag,
     );
     _bvid = widget.videoDetailController.bvid;
     if (_controller.loadingState.value
