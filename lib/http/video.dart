@@ -65,7 +65,7 @@ abstract final class VideoHttp {
       params = <String, Object>{
         'plat': 1,
         'feed_version': 'V1',
-        'ps': ps,
+        if (ps != null) 'ps': ps,
         'fresh_idx': freshIdx,
         // 0 初次进入、3 下拉刷新、4 加载更多
         'fresh_type': freshIdx == 0 ? 0 : 4,
