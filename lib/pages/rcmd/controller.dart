@@ -1,13 +1,19 @@
 import 'package:PiliPlus/http/loading_state.dart';
 import 'package:PiliPlus/http/video.dart';
+import 'package:PiliPlus/models/common/rcmd_source.dart';
 import 'package:PiliPlus/models/home/rcmd/result.dart'
     show RcmdVideoItemAppModel;
+import 'package:PiliPlus/pages/common/common_controller.dart'
+    show RefreshImplMixin;
 import 'package:PiliPlus/pages/common/common_list_controller.dart';
+import 'package:PiliPlus/utils/extension/scroll_controller_ext.dart';
 import 'package:PiliPlus/utils/storage_pref.dart';
 
-class RcmdController extends CommonListController {
+class RcmdController extends CommonListController with RefreshImplMixin {
   late bool enableSaveLastData = Pref.enableSaveLastData;
-  final bool appRcmd = Pref.appRcmd;
+
+  /// 可在设置页切换后立即生效，无需重启
+  RcmdSource rcmdSource = Pref.rcmdSource;
 
   int? lastRefreshAt;
   late bool savedRcmdTip = Pref.savedRcmdTip;
@@ -36,11 +42,12 @@ class RcmdController extends CommonListController {
   Future<LoadingState> customGetData() async {
     final int want = Pref.refreshCount;
 
-    if (!appRcmd) {
-      // Web 端推荐接口尊重 ps（实测 ps=N 就返回 N 条），一次请求即可
+    if (rcmdSource != RcmdSource.app) {
+      // Web/桌面端推荐接口尊重 ps（实测 ps=N 就返回 N 条），一次请求即可
       return VideoHttp.rcmdVideoList(
         freshIdx: page,
         ps: want + _filterSlack,
+        desktop: rcmdSource == RcmdSource.desktop,
       );
     }
 
@@ -93,5 +100,10 @@ class RcmdController extends CommonListController {
     page = 0;
     isEnd = false;
     return queryData();
+  }
+
+  void toTopAndRefresh() {
+    scrollController.jumpToTop();
+    showRefresh();
   }
 }
